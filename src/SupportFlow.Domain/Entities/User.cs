@@ -10,6 +10,8 @@ public class User
     public string PasswordHash { get; private set; }
     public Department Department { get; private set; }
     public string? PhoneNumber { get; private set; }
+    
+    public Role Role { get; private set; }
 
     public User(
         string name,
@@ -17,7 +19,8 @@ public class User
         string email,
         string passwordHash,
         Department department,
-        string? phoneNumber
+        string? phoneNumber,
+        Role role
     )
     {
 
@@ -43,6 +46,7 @@ public class User
         PasswordHash = passwordHash;
         Department = department;
         PhoneNumber = phoneNumber;
+        Role = role;
         
     }
 

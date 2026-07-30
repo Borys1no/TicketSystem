@@ -12,6 +12,7 @@ public class Ticket
     public TicketStatus Status { get; private set; }
     public DateTime CreateAt { get; private set; }
     public Guid CreatedByUserId { get; private set; }
+    public Guid? AssignedToUserId { get; private set; }
 
     public Ticket(
         string title,
@@ -31,15 +32,7 @@ public class Ticket
         Status = TicketStatus.Pending;
         CreateAt = DateTime.UtcNow;
     }
-
-    public void StartProgress()
-    {
-        if (Status != TicketStatus.Pending)
-            throw new InvalidOperationException("Only pending tickets can be started.");
-        
-            
-        Status = TicketStatus.InProgress;
-    }
+    
 
     public void Resolve()
     {
@@ -60,6 +53,19 @@ public class Ticket
         if (Status != TicketStatus.Closed) 
             throw new InvalidOperationException("Only resolved tickets can be reopened. ");
         Status = TicketStatus.Reopened;
+    }
+
+    public void AssignTo(User technician)
+    {
+        if (technician.Role != Role.Technician)
+            throw new InvalidOperationException("Only technician can be  assigned to tickets.");
+        
+        if(Status != TicketStatus.Pending && Status != TicketStatus.Reopened)
+                throw new InvalidOperationException("Only pending or reopened tickets can be assigned.");
+        
+        
+        AssignedToUserId = technician.Id;
+        Status = TicketStatus.InProgress;
     }
     
 }
