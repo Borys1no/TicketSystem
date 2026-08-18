@@ -13,5 +13,10 @@ obj/
 *.user
 *.suo
 
+#Local congiguration / secrets
+.env
+.env.*
+*.local.json
+
 #Other
 resume.md
