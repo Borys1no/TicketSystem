@@ -1,6 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SupportFlow.Application.Interfaces;
 using SupportFlow.Infrastructure.Data;
+using SupportFlow.Infrastructure.Repositories;
+using SupportFlow.Application.Commands.Tickets;
+
 
 namespace SupportFlow.Infrastructure;
 
@@ -8,12 +13,14 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
-        string connectionString
+        IConfiguration configuration
     )
     {
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(connectionString)
-        );
+            options.UseNpgsql(
+                configuration.GetConnectionString("SupportFlow")));
+        services.AddScoped<ITicketRepository, TicketRepository>();
+        services.AddScoped<CreateTicketCommandHandler>();
         return services;
     }
 }

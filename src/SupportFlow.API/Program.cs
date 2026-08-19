@@ -2,13 +2,11 @@ using SupportFlow.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddControllers();
+
 builder.Services.AddInfrastructure(
-    builder.Configuration.GetConnectionString("SupportFlow")
-    ?? throw new InvalidOperationException(
-        "Connection string 'SupportFlow' not found."
-        )
-    );
-    builder.Services.AddControllers();
+    builder.Configuration);
     var app = builder.Build();
     app.MapControllers();
     app.Run();
+    
