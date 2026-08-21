@@ -13,7 +13,7 @@ public class CreateUserCommandHandler
         _userRepository = userRepository;
     }
 
-    public async Task Handle(CreateUserCommand command)
+    public async Task<User> Handle(CreateUserCommand command)
     {
         var user = new User(
             command.Name,
@@ -25,5 +25,6 @@ public class CreateUserCommandHandler
             command.Role
         );
         await _userRepository.AddAsync(user);
+        return user;
     }
 }

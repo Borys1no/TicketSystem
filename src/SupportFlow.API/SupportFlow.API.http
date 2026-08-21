@@ -1,6 +1,12 @@
-@SupportFlow.API_HostAddress = http://localhost:5098
+POST http://localhost:5098/api/users
+Content-Type: application/json
 
-GET {{SupportFlow.API_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
+{
+  "name" : "Carloz",
+  "lastName" : "Rodriguez",
+  "email" : "carlos@supportflow.com",
+  "password" : "123456",
+  "department" : 0,
+  "phoneNumber" : "099539283",
+  "role" : 1
+}

@@ -6,6 +6,7 @@ using SupportFlow.Infrastructure.Data;
 using SupportFlow.Infrastructure.Repositories;
 using SupportFlow.Application.Commands.Tickets;
 using SupportFlow.Application.Commands.Users;
+using SupportFlow.Application.Queries.Users;
 
 namespace SupportFlow.Infrastructure;
 
@@ -23,6 +24,7 @@ public static class DependencyInjection
         services.AddScoped<CreateTicketCommandHandler>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<CreateUserCommandHandler>();
+        services.AddScoped<GetUserByIdQueryHandler>();
         
         
         return services;
