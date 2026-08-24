@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using SupportFlow.Application.Commands.Users;
 using SupportFlow.Application.DTOs.Users;
 using SupportFlow.Application.Queries.Users;
+using SupportFlow.Application.Mappers;
 
 namespace SupportFlow.API.Controllers;
 
@@ -13,15 +14,18 @@ public class UsersController : ControllerBase
     private readonly CreateUserCommandHandler _handler;
     private readonly CreateUserCommandHandler _createUserHandler;
     private readonly GetUserByIdQueryHandler _getUserByIdQueryHandler;
+    private readonly GetUsersQueryHandler _getUsersHandler;
 
     public UsersController(CreateUserCommandHandler handler,
         CreateUserCommandHandler createUserHandler,
-        GetUserByIdQueryHandler getUserByIdQueryHandler
+        GetUserByIdQueryHandler getUserByIdQueryHandler,
+        GetUsersQueryHandler getUsersHandler
         )
     {
         _handler = handler;
         _createUserHandler = createUserHandler;
        _getUserByIdQueryHandler = getUserByIdQueryHandler;
+       _getUsersHandler = getUsersHandler;
     }
 
     [HttpPost]
@@ -39,16 +43,7 @@ public class UsersController : ControllerBase
         };
 
         var user = await _handler.Handle(command);
-        var response = new UserResponse
-            {
-                Id = user.Id,
-                Name = user.Name,
-                LastName = user.LastName,
-                Email = user.Email,
-                Department = user.Department.ToString(),
-                PhoneNumber = user.PhoneNumber,
-                Role = user.Role.ToString()
-            };
+        var response = UserMapper.ToResponse(user);
         return Created($"api/users/{user.Id}", response);
 
     }
@@ -60,16 +55,16 @@ public class UsersController : ControllerBase
         var user = await _getUserByIdQueryHandler.Handle(query);
         if (user is null)
             return NotFound();
-        var response = new UserResponse()
-        {
-            Id = user.Id,
-            Name = user.Name,
-            LastName = user.LastName,
-            Email = user.Email,
-            Department = user.Department.ToString(),
-            PhoneNumber = user.PhoneNumber,
-            Role = user.Role.ToString()
-        };
+        var response = UserMapper.ToResponse(user);
+        return Ok(response);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var query = new GetUsersQuery();
+        var users = await _getUsersHandler.Handle(query);
+        var response = users.Select(UserMapper.ToResponse);
         return Ok(response);
     }
 }
