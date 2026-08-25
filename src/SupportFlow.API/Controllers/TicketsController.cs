@@ -14,12 +14,16 @@ public class TicketsController : ControllerBase
 {
     private readonly CreateTicketCommandHandler _createHandler;
     private readonly GetTicketsQueryHandler _getTicketsHandler;
+    private readonly GetTicketByIdQueryHandler _getTicketByIdQueryHandler;
 
-    public TicketsController(CreateTicketCommandHandler createHandler,
-        GetTicketsQueryHandler getTicketsHandler)
+    public TicketsController(
+        CreateTicketCommandHandler createHandler,
+        GetTicketsQueryHandler getTicketsHandler,
+        GetTicketByIdQueryHandler getTicketByIdQueryHandler)
     {
         _createHandler = createHandler;
         _getTicketsHandler = getTicketsHandler;
+        _getTicketByIdQueryHandler = getTicketByIdQueryHandler;
     }
 
     [HttpPost]
@@ -56,6 +60,19 @@ public class TicketsController : ControllerBase
         var tickets = await _getTicketsHandler.Handle();
         var response = tickets.Select(TicketMapper.ToResponse);
         return Ok (response);
+    }
+
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        var ticket = await _getTicketByIdQueryHandler.Handle(id);
+        if (ticket is null)
+            return NotFound(new
+            {
+                message = "Ticket not found."
+            });
+        var response = TicketMapper.ToResponse(ticket);
+        return Ok(response);
     }
 
 }

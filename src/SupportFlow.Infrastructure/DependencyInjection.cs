@@ -28,6 +28,7 @@ public static class DependencyInjection
         services.AddScoped<GetUserByIdQueryHandler>();
         services.AddScoped<GetUsersQueryHandler>();
         services.AddScoped<GetTicketsQueryHandler>();
+        services.AddScoped<GetTicketByIdQueryHandler>();
         
         
         return services;
