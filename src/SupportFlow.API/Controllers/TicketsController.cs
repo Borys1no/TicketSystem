@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using SupportFlow.Application.Commands.Tickets;
 using SupportFlow.Application.DTOs.Tickets;
+using SupportFlow.Application.Mappers;
+using System;
+using SupportFlow.Application.Queries.Tickets;
 
 namespace SupportFlow.API.Controllers;
 
@@ -9,11 +12,14 @@ namespace SupportFlow.API.Controllers;
 public class TicketsController : ControllerBase
 
 {
-    private readonly CreateTicketCommandHandler _handler;
+    private readonly CreateTicketCommandHandler _createHandler;
+    private readonly GetTicketsQueryHandler _getTicketsHandler;
 
-    public TicketsController(CreateTicketCommandHandler handler)
+    public TicketsController(CreateTicketCommandHandler createHandler,
+        GetTicketsQueryHandler getTicketsHandler)
     {
-        _handler = handler;
+        _createHandler = createHandler;
+        _getTicketsHandler = getTicketsHandler;
     }
 
     [HttpPost]
@@ -27,10 +33,29 @@ public class TicketsController : ControllerBase
             Priority = request.Priority,
             CreatedByUserId = request.CreatedByUserId
         };
+        try
+        {
+            var ticket = await _createHandler.Handle(command);
+            var response = TicketMapper.ToResponse(ticket);
+            return Created($"/api/tickets/{ticket.Id}", response);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return NotFound(new
+            {
+                message = ex.Message
+            });
+        }
 
-        await _handler.Handle(command);
+        
+    }
 
-        return Ok();
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var tickets = await _getTicketsHandler.Handle();
+        var response = tickets.Select(TicketMapper.ToResponse);
+        return Ok (response);
     }
 
 }
