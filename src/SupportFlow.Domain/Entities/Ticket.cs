@@ -51,7 +51,7 @@ public class Ticket
     public void Reopen()
     {
         if (Status != TicketStatus.Closed) 
-            throw new InvalidOperationException("Only resolved tickets can be reopened. ");
+            throw new InvalidOperationException("Only closed tickets can be reopened. ");
         Status = TicketStatus.Reopened;
     }
 

@@ -30,4 +30,10 @@ public class TicketRepository : ITicketRepository
     {
         return await _context.Tickets.ToListAsync();
     }
+
+    public async Task UpdateAsync(Ticket ticket)
+    {
+        _context.Tickets.Update(ticket);
+        await _context.SaveChangesAsync();
+    }
 }

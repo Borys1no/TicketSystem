@@ -22,6 +22,7 @@ public static class DependencyInjection
             options.UseNpgsql(
                 configuration.GetConnectionString("SupportFlow")));
         services.AddScoped<ITicketRepository, TicketRepository>();
+        
         services.AddScoped<CreateTicketCommandHandler>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<CreateUserCommandHandler>();
@@ -29,7 +30,10 @@ public static class DependencyInjection
         services.AddScoped<GetUsersQueryHandler>();
         services.AddScoped<GetTicketsQueryHandler>();
         services.AddScoped<GetTicketByIdQueryHandler>();
-        
+        services.AddScoped<ResolveTicketCommandHandler>();
+        services.AddScoped<AssignTicketCommandHandler>();
+        services.AddScoped<CloseTicketCommandHandler>();
+        services.AddScoped<ReopenTicketCommandHandler>();
         
         return services;
     }

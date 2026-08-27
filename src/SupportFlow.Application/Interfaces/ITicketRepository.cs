@@ -9,5 +9,7 @@ public interface ITicketRepository
     Task<Ticket?> GetByIdAsync(Guid id);
 
     Task<IEnumerable<Ticket>> GetAllAsync();
-    
+
+    Task UpdateAsync(Ticket ticket);
+
 }
