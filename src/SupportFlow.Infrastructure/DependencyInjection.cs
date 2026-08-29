@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SupportFlow.Application.Commands.Auth;
 using SupportFlow.Application.Interfaces;
 using SupportFlow.Infrastructure.Data;
 using SupportFlow.Infrastructure.Repositories;
@@ -8,6 +9,7 @@ using SupportFlow.Application.Commands.Tickets;
 using SupportFlow.Application.Commands.Users;
 using SupportFlow.Application.Queries.Users;
 using SupportFlow.Application.Queries.Tickets;
+using SupportFlow.Infrastructure.Security;
 
 namespace SupportFlow.Infrastructure;
 
@@ -34,6 +36,9 @@ public static class DependencyInjection
         services.AddScoped<AssignTicketCommandHandler>();
         services.AddScoped<CloseTicketCommandHandler>();
         services.AddScoped<ReopenTicketCommandHandler>();
+        services.AddScoped<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<LoginCommandHandler>();
+        services.AddScoped<IJwtTokenGenerator, JwTokenGenerator>();
         
         return services;
     }

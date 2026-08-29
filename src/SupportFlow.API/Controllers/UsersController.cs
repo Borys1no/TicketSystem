@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SupportFlow.Application.Commands.Users;
 using SupportFlow.Application.DTOs.Users;
@@ -8,6 +9,7 @@ namespace SupportFlow.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 
 public class UsersController : ControllerBase
 {
@@ -36,7 +38,7 @@ public class UsersController : ControllerBase
             Name = request.Name,
             LastName = request.LastName,
             Email = request.Email,
-            PasswordHash = request.Password,
+            Password = request.Password,
             Department = request.Department,
             PhoneNumber = request.PhoneNumber,
             Role = request.Role
