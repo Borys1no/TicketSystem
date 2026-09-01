@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 using SupportFlow.Application.Commands.Tickets;
 using SupportFlow.Application.DTOs.Tickets;
 using SupportFlow.Application.Mappers;
@@ -39,20 +41,40 @@ public class TicketsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Employee, Adminitrador")]
     public async Task<IActionResult> Create(
         CreateTicketRequest request)
     {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim is null)
+        {
+            return Unauthorized(new
+            {
+                message = "User ID not found in token."
+            });
+        }
+
+        if (!Guid.TryParse(userIdClaim.Value, out var userId))
+        {
+            return Unauthorized(new
+            {
+                message = "Invalid user ID in token."
+            });
+        }
+
         var command = new CreateTicketCommand
         {
             Title = request.Title,
             Description = request.Description,
             Priority = request.Priority,
-            CreatedByUserId = request.CreatedByUserId
+            CreatedByUserId = userId
         };
+
         try
         {
             var ticket = await _createHandler.Handle(command);
             var response = TicketMapper.ToResponse(ticket);
+
             return Created($"/api/tickets/{ticket.Id}", response);
         }
         catch (InvalidOperationException ex)
@@ -63,10 +85,13 @@ public class TicketsController : ControllerBase
             });
         }
 
-        
+
+
+
     }
 
     [HttpGet]
+    [Authorize(Roles = "Technician, Adminitrador")]
     public async Task<IActionResult> GetAll()
     {
         var tickets = await _getTicketsHandler.Handle();
@@ -75,6 +100,7 @@ public class TicketsController : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [Authorize(Roles = "Technician, Adminitrador")]
     public async Task<IActionResult> GetById(Guid id)
     {
         var ticket = await _getTicketByIdQueryHandler.Handle(id);
@@ -88,6 +114,7 @@ public class TicketsController : ControllerBase
     }
 
     [HttpPost("{id:guid}/resolve")]
+    [Authorize (Roles = "Technician")]
     public async Task<IActionResult> Resolve(Guid id)
     {
         try
@@ -117,6 +144,7 @@ public class TicketsController : ControllerBase
     }
 
     [HttpPost("{id:guid}/assign")]
+    [Authorize (Roles = "Adminitrador")]
     public async Task<IActionResult> Assign(
         Guid id,
         AssignTicketRequest request)
@@ -149,6 +177,7 @@ public class TicketsController : ControllerBase
     }
 
     [HttpPost("{id:guid}/close")]
+    [Authorize (Roles = "Adminitrador")]
     public async Task<IActionResult> Close(Guid id)
     {
         try
@@ -178,6 +207,7 @@ public class TicketsController : ControllerBase
     }
 
     [HttpPost("{id:guid}/reopen")]
+    [Authorize (Roles = "Adminitrador")]
     public async Task<IActionResult> Reopen(Guid id)
     {
         try
