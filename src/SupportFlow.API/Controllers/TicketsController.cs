@@ -117,11 +117,22 @@ public class TicketsController : ControllerBase
     [Authorize (Roles = "Technician")]
     public async Task<IActionResult> Resolve(Guid id)
     {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim is null ||
+            !Guid.TryParse(userIdClaim.Value, out var technicianId))
+        {
+            return Unauthorized(new
+            {
+                message = "Invalid user Id in token."
+            });
+        }
+
         try
         {
             var command = new ResolveTicketCommand
             {
-                TicketId = id
+                TicketId = id,
+                TechnicianId = technicianId
             };
             var ticket = await _resolveHandler.Handle(command);
             var response = TicketMapper.ToResponse(ticket);
@@ -130,6 +141,13 @@ public class TicketsController : ControllerBase
         catch (KeyNotFoundException ex)
         {
             return NotFound(new
+            {
+                message = ex.Message
+            });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new
             {
                 message = ex.Message
             });

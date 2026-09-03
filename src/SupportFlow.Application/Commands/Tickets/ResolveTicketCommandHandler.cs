@@ -21,6 +21,11 @@ public class ResolveTicketCommandHandler
         
         if(ticket is null)
             throw new KeyNotFoundException("Ticket not found.");
+        if (ticket.AssignedToUserId != command.TechnicianId)
+        {
+            throw new UnauthorizedAccessException(
+                "You can only resolve tickets assigned to you.");
+        }
         ticket.Resolve();
 
         await _ticketRepository.UpdateAsync(ticket);

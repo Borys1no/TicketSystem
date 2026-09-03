@@ -9,23 +9,20 @@ namespace SupportFlow.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+[Authorize(Roles = "Adminitrador")]
 
 public class UsersController : ControllerBase
 {
     private readonly CreateUserCommandHandler _handler;
-    private readonly CreateUserCommandHandler _createUserHandler;
     private readonly GetUserByIdQueryHandler _getUserByIdQueryHandler;
     private readonly GetUsersQueryHandler _getUsersHandler;
 
     public UsersController(CreateUserCommandHandler handler,
-        CreateUserCommandHandler createUserHandler,
         GetUserByIdQueryHandler getUserByIdQueryHandler,
         GetUsersQueryHandler getUsersHandler
         )
     {
         _handler = handler;
-        _createUserHandler = createUserHandler;
        _getUserByIdQueryHandler = getUserByIdQueryHandler;
        _getUsersHandler = getUsersHandler;
     }
