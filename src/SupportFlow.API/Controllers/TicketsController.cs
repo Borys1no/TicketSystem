@@ -21,6 +21,7 @@ public class TicketsController : ControllerBase
     private readonly AssignTicketCommandHandler _assignHandler;
     private readonly CloseTicketCommandHandler _closeHandler;
     private readonly ReopenTicketCommandHandler _reopenHandler;
+    private readonly GetMyTicketsQueryHandler _getMyTicketsHandler;
 
     public TicketsController(
         CreateTicketCommandHandler createHandler,
@@ -29,7 +30,8 @@ public class TicketsController : ControllerBase
         ResolveTicketCommandHandler resolveHandler,
         AssignTicketCommandHandler assignHandler,
         CloseTicketCommandHandler closeHandler,
-        ReopenTicketCommandHandler reopenHandler)
+        ReopenTicketCommandHandler reopenHandler,
+        GetMyTicketsQueryHandler getMyTicketsHandler)
     {
         _createHandler = createHandler;
         _getTicketsHandler = getTicketsHandler;
@@ -38,6 +40,7 @@ public class TicketsController : ControllerBase
         _assignHandler = assignHandler;
         _closeHandler = closeHandler;
         _reopenHandler = reopenHandler;
+        _getMyTicketsHandler = getMyTicketsHandler;
     }
 
     [HttpPost]
@@ -97,6 +100,30 @@ public class TicketsController : ControllerBase
         var tickets = await _getTicketsHandler.Handle();
         var response = tickets.Select(TicketMapper.ToResponse);
         return Ok (response);
+    }
+
+    [HttpGet("my")]
+    [Authorize(Roles = "Employee")]
+    public async Task<IActionResult> GetMyTickets()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim is null ||
+            !Guid.TryParse(userIdClaim.Value, out var userId))
+        {
+            return Unauthorized(new
+            {
+                message = "Invalid user Id in token."
+            });
+        }
+
+        var query = new GetMyTicketsQuery
+        {
+            UserId = userId
+        };
+        var tickets = await _getMyTicketsHandler.Handle(query);
+        var response = tickets.Select(TicketMapper.ToResponse);
+        return Ok(response);
+
     }
 
     [HttpGet("{id:guid}")]

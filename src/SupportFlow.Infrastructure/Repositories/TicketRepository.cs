@@ -36,4 +36,11 @@ public class TicketRepository : ITicketRepository
         _context.Tickets.Update(ticket);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<IEnumerable<Ticket>> GetByCreatedByUserAsync(Guid userId)
+    {
+        return await _context.Tickets
+            .Where(t => t.CreatedByUserId == userId)
+            .ToListAsync();
+    }
 }

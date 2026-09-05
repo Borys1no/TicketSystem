@@ -12,4 +12,6 @@ public interface ITicketRepository
 
     Task UpdateAsync(Ticket ticket);
 
+    Task<IEnumerable<Ticket>> GetByCreatedByUserAsync(Guid userId);
+
 }

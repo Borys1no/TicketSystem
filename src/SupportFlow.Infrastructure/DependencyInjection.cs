@@ -39,6 +39,7 @@ public static class DependencyInjection
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<LoginCommandHandler>();
         services.AddScoped<IJwtTokenGenerator, JwTokenGenerator>();
+        services.AddScoped<GetMyTicketsQueryHandler>();
         
         return services;
     }
