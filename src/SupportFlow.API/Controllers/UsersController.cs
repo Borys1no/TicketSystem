@@ -40,21 +40,15 @@ public class UsersController : ControllerBase
             PhoneNumber = request.PhoneNumber,
             Role = request.Role
         };
-        try
-        {
+        
             var user = await _handler.Handle(command);
             var response = UserMapper.ToResponse(user);
             return Created($"api/users/{user.Id}", response);
 
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new
-            {
-                message = ex.Message
-            });
+        
+        
 
-        }
+        
         
 
     }
