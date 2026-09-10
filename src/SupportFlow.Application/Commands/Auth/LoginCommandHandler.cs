@@ -23,7 +23,8 @@ public class LoginCommandHandler
 
     public async Task<string> Handle(LoginCommand command)
     {
-        var user = await _userRepository.GetByEmailAsync(command.Email);
+        var email = command.Email.Trim().ToLowerInvariant();
+        var user = await _userRepository.GetByEmailAsync(email);
         if (user is null)
             throw new InvalidOperationException("Invalid email or password.");
 

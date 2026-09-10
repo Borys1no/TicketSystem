@@ -38,5 +38,9 @@ public class UserRepository :IUserRepository
             .ToListAsync();
     }
 
-    
+    public async Task<bool> ExistsByEmailAsync(string email)
+    {
+        return await _context.Users
+            .AnyAsync(u => u.Email == email);
+    }
 }

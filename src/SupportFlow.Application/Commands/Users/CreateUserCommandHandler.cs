@@ -18,11 +18,15 @@ public class CreateUserCommandHandler
 
     public async Task<User> Handle(CreateUserCommand command)
     {
+        var email = command.Email.Trim().ToLowerInvariant();
+        var emailExists = await _userRepository.ExistsByEmailAsync(email);
+        if (emailExists)
+            throw new InvalidOperationException("Email is already registered.");
         var passwordHash = _passwordHasher.Hash(command.Password);
         var user = new User(
             command.Name,
             command.LastName,
-            command.Email,
+            email,
             passwordHash,
             command.Department,
             command.PhoneNumber,
