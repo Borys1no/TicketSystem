@@ -43,4 +43,11 @@ public class TicketRepository : ITicketRepository
             .Where(t => t.CreatedByUserId == userId)
             .ToListAsync();
     }
+
+    public async Task<IEnumerable<Ticket>> GetByAssignedToUserAsync(Guid userId)
+    {
+        return await _context.Tickets
+            .Where(t => t.AssignedToUserId == userId)
+            .ToListAsync();
+    }
 }

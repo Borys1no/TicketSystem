@@ -40,6 +40,7 @@ public static class DependencyInjection
         services.AddScoped<LoginCommandHandler>();
         services.AddScoped<IJwtTokenGenerator, JwTokenGenerator>();
         services.AddScoped<GetMyTicketsQueryHandler>();
+        services.AddScoped<GetMyAssignedTicketsQueryHandler>();
         
         return services;
     }

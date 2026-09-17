@@ -22,6 +22,7 @@ public class TicketsController : ControllerBase
     private readonly CloseTicketCommandHandler _closeHandler;
     private readonly ReopenTicketCommandHandler _reopenHandler;
     private readonly GetMyTicketsQueryHandler _getMyTicketsHandler;
+    private readonly GetMyAssignedTicketsQueryHandler _getMyAssignedTicketsQueryHandler;
 
     public TicketsController(
         CreateTicketCommandHandler createHandler,
@@ -31,7 +32,8 @@ public class TicketsController : ControllerBase
         AssignTicketCommandHandler assignHandler,
         CloseTicketCommandHandler closeHandler,
         ReopenTicketCommandHandler reopenHandler,
-        GetMyTicketsQueryHandler getMyTicketsHandler)
+        GetMyTicketsQueryHandler getMyTicketsHandler,
+        GetMyAssignedTicketsQueryHandler getMyAssignedTicketsQueryHandler)
     {
         _createHandler = createHandler;
         _getTicketsHandler = getTicketsHandler;
@@ -41,6 +43,7 @@ public class TicketsController : ControllerBase
         _closeHandler = closeHandler;
         _reopenHandler = reopenHandler;
         _getMyTicketsHandler = getMyTicketsHandler;
+        _getMyAssignedTicketsQueryHandler = getMyAssignedTicketsQueryHandler;
     }
 
     [HttpPost]
@@ -124,6 +127,29 @@ public class TicketsController : ControllerBase
         var response = tickets.Select(TicketMapper.ToResponse);
         return Ok(response);
 
+    }
+
+    [HttpGet("assigned")]
+    [Authorize(Roles = "Technician")]
+    public async Task<IActionResult> GetMyAssignedTickets()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if(userIdClaim is null ||
+            !Guid.TryParse(userIdClaim.Value, out var userId))
+        {
+            return Unauthorized(new
+            {
+                message = "Invalid user Id in token."
+            });
+        }
+
+        var query = new GetMyAssignedTicketsQuery
+        {
+            UserId = userId
+        };
+        var tickets = await _getMyAssignedTicketsQueryHandler.Handle(query);
+        var response = tickets.Select(TicketMapper.ToResponse);
+        return Ok(response);
     }
 
     [HttpGet("{id:guid}")]
